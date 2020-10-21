@@ -234,8 +234,7 @@ class Momentum {
             console.log(hours);
             if (hours < 23) this.getImage(hours);
             else {
-                alert('это последнее изображение на сегодня:) после полуночи будет доступен новый сет изображений');
-                break;
+               this.getImage(0);
             }
         }
     }

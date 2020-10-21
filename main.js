@@ -1,10 +1,13 @@
 class Momentum {
     constructor () {
         this.time = '';
+        this.hours = '';
         this.day = '';
         this.greeting =  '';
         this.name = '';
         this.focus = '';
+        this.currentImageBase = [];
+        this.images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     }
 
     getTime() {
@@ -16,6 +19,7 @@ class Momentum {
         if(minutes < 10) minutes= '0' + minutes;
         this.time = `${hours}:${minutes}:${sec}`;
         time.textContent = this.time;
+        if(minutes == '00' && sec == '00') this.getImage(hours);
         setInterval (this.getTime, 1000); 
     }
 
@@ -104,11 +108,13 @@ class Momentum {
     setGreeting() {
         let now = new Date();
         let hours = now.getHours();
-        if(hours < 12) this.greeting = 'Доброе утро,';
-        else if (hours < 18) this.greeting = 'Добрый день,';
+        if(this.hours < 6) this.greeting = 'Доброй ночи,'
+        else if(this.hours < 12) this.greeting = 'Доброе утро,';
+        else if (this.hours < 18) this.greeting = 'Добрый день,';
         else this.greeting = 'Добрый вечер,';
 
         greeting.textContent = this.greeting;
+    
     }
 
     getName() {
@@ -117,8 +123,12 @@ class Momentum {
     }
 
     setName(e) {
-        if( (e.type === 'keydown' && e.keyCode == 13) || e.type === 'blur') {
-            localStorage.setItem('name', e.target.innerText);
+        if( e.type == 'keydown' && e.code == 'Enter' ) {
+            if (e.target.innerText == '') {
+                e.target.textContent = '[Enter Name]';
+                localStorage.removeItem('name');
+            }
+            else localStorage.setItem('name', e.target.innerText);
             name.blur();
         }
     }
@@ -129,8 +139,12 @@ class Momentum {
     }
 
     setFocus(e) {
-        if( (e.type === 'keydown' && e.keyCode == 13) || e.type === 'blur') {
-            localStorage.setItem('focus', e.target.innerText);
+        if( e.type == 'keydown' && e.code == 'Enter' ) {
+            if (e.target.innerText == '') {
+                e.target.textContent = '[Enter plan]';
+                localStorage.removeItem('focus');
+            }
+            else localStorage.setItem('focus', e.target.innerText);
             focus.blur();
         }
     }
@@ -144,19 +158,93 @@ class Momentum {
     }
 
     async getWeather() {  
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.textContent}&lang=ru&appid=88029370652b5b8a53deaeebff191a8e&units=metric`;
+        let currentCity = (localStorage.getItem('city')) ? localStorage.getItem('city') : '[Enter city]';
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${currentCity}&lang=ru&appid=88029370652b5b8a53deaeebff191a8e&units=metric`;
+        try {
         const res = await fetch(url);
-        const data = await res.json(); 
+        const data = await res.json();
         weatherIcon.className = 'weather-icon owf';
         weatherIcon.classList.add(`owf-${data.weather[0].id}`);
         let roundedTemp = Math.round(data.main.temp)
         temperature.textContent = `${roundedTemp}°C`;
         humidity.textContent = `${data.main.humidity}%`;
-        wind.textContent = `${data.wind.speed}m/s`;
-        //weatherDescription.textContent = data.weather[0].description;
+        wind.textContent = `${data.wind.speed}m/s`; 
+        }
+        catch(error) {
+            temperature.textContent = '';
+            humidity.textContent = '';
+            wind.textContent = ''; 
+            alert('город не найден, попробуйте снова');
+        }
     }
 
-    
+    createImagesArray() {
+        let currentImageBase = [];
+        let baseChoices = ['./assets/images/night/', './assets/images/morning/', './assets/images/day/', './assets/images/evening/' ]
+        let randomCoef = this.randomInteger(1, 14);
+        for(let i = 0; i < baseChoices.length; i++) {
+            currentImageBase.push([]);
+            for (let k = 0; k < 6; k++) {
+            currentImageBase[i].push(baseChoices[i] + this.images[k + randomCoef]);
+            }
+        }
+        this.currentImageBase = currentImageBase;
+        console.log(this.currentImageBase);
+        let timeNow = new Date();
+        let currentHour = timeNow.getHours();
+        this.getImage(currentHour);
+    }
+
+    getImage(hours) {
+        let imageSrc;
+        switch(hours) {
+            case hours < 6:
+              imageSrc = this.currentImageBase[0][hours];
+            break;
+            case hours < 12:
+              imageSrc = this.currentImageBase[1][hours];
+            break;
+            case hours < 18:
+                imageSrc = this.currentImageBase[2][hours];
+            break;
+            case hours < 23:
+                imageSrc = this.currentImageBase[3][hours];
+            break;
+            default:
+                imageSrc = this.currentImageBase[0][5];
+            break;
+        }
+        this.setBgImage(imageSrc);
+    } 
+
+    setBgImage(data) {
+        const src = data;
+        const img = document.createElement('img');
+        img.src = src;
+        img.onload = () => {    
+           body.style.backgroundImage = `url(${src})`;
+        }; 
+    }
+
+    viewAllImages() {
+        let now = new Date();
+        let hours = now.getHours();
+        for (let i = 0; i < 24; i++) {
+            hours += i;
+            console.log(hours);
+            if (hours < 23) this.getImage(hours);
+            else {
+                alert('это последнее изображение на сегодня:) после полуночи будет доступен новый сет изображений');
+                break;
+            }
+        }
+    }
+
+    randomInteger(min, max) {
+        // случайное число от min до (max+1)
+        let rand = min + Math.random() * (max + 1 - min);
+        return Math.floor(rand);
+    }
 
     init() {
         this.getTime();
@@ -165,12 +253,13 @@ class Momentum {
         this.getName();
         this.getFocus();
         this.getWeather();
+        this.createImagesArray();
     }
 
 };
 
 //get DOM elements
-
+const body = document.querySelector('body');
 const time = document.querySelector('.time');
 const day = document.querySelector('.day');
 const greeting = document.querySelector('.greeting');
@@ -185,27 +274,57 @@ const humidity = document.querySelector('.humidity');
 const wind = document.querySelector('.wind');
 const weatherDescription = document.querySelector('.weather-description');
 const city = document.querySelector('.city');
-
-
+const updBcg = document.querySelector('.update-bcg');
 
 const momentum = new Momentum();
 momentum.init();
 
 name.addEventListener('blur', momentum.setName);
 name.addEventListener('keydown', momentum.setName);
+name.addEventListener('click', () => {
+    name.textContent = '';
+});
 
 focus.addEventListener('blur', momentum.setFocus);
 focus.addEventListener('keydown', momentum.setFocus);
+focus.addEventListener('click', () => {
+    focus.textContent = '';
+});
 
-document.addEventListener('DOMContentLoaded', momentum.getQuote);
+document.addEventListener("DOMContentLoaded", momentum.getQuote);
 phraseChangeBtn.addEventListener('click', momentum.getQuote);
 
-document.addEventListener('DOMContentLoaded', momentum.getWeather);
-city.addEventListener('blur', momentum.getWeather);
-city.addEventListener('keydown', (e) => {
-    if (e.keyCode == 13) {
-        city.blur();
-        momentum.getWeather;
+document.addEventListener('DOMContentLoaded', () => {
+    city.textContent = localStorage.getItem('city') ? localStorage.getItem('city') : '[Enter city]';
+    momentum.getWeather();
+});
+
+city.addEventListener('blur', (e) => {
+    if (city.textContent == '') {
+        city.textContent = (localStorage.getItem('city')) ? localStorage.getItem('city') : '[Enter city]';
+    }
+    else {
+    localStorage.setItem('city', city.textContent);
+    momentum.getWeather();
     }
 });
+
+city.addEventListener('keydown', (e) => {
+    if (e.keyCode == 13) {
+        if (city.textContent == '') {
+            city.textContent = (localStorage.getItem('city')) ? localStorage.getItem('city') : '[Enter city]';
+          }
+        else {
+            localStorage.setItem('city', city.textContent);
+            momentum.getWeather();
+        }
+        city.blur();
+    }
+});
+city.addEventListener('click', () => {
+    city.textContent = '';
+});
+
+document.addEventListener('load', momentum.createImagesArray);
+updBcg.addEventListener('click', momentum.viewAllImages);
 

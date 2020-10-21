@@ -174,7 +174,7 @@ class Momentum {
             temperature.textContent = '';
             humidity.textContent = '';
             wind.textContent = ''; 
-            alert('город не найден, попробуйте снова');
+            alert('Для получения прогноза введите название города');
         }
     }
 

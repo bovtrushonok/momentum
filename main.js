@@ -6,6 +6,7 @@ class Momentum {
         this.greeting =  '';
         this.name = '';
         this.focus = '';
+        this.clickCount = 1;
         this.currentImageBase = [];
         this.images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     }
@@ -13,13 +14,14 @@ class Momentum {
     getTime() {
         let now = new Date();
         let hours = now.getHours();
+        this.hours = hours;
         let minutes = now.getMinutes();
         let sec = now.getSeconds();
         if(sec < 10) sec= '0' + sec;
         if(minutes < 10) minutes= '0' + minutes;
         this.time = `${hours}:${minutes}:${sec}`;
         time.textContent = this.time;
-        if(minutes == '00' && sec == '00') this.getImage(hours);
+        if(minutes == '09' && sec == '00') getImage(hours);
         setInterval (this.getTime, 1000); 
     }
 
@@ -106,8 +108,7 @@ class Momentum {
     }
 
     setGreeting() {
-        let now = new Date();
-        let hours = now.getHours();
+     
         if(this.hours < 6) this.greeting = 'Доброй ночи,'
         else if(this.hours < 12) this.greeting = 'Доброе утро,';
         else if (this.hours < 18) this.greeting = 'Добрый день,';
@@ -195,25 +196,14 @@ class Momentum {
         this.getImage(currentHour);
     }
 
-    getImage(hours) {
-        let imageSrc;
-        switch(hours) {
-            case hours < 6:
-              imageSrc = this.currentImageBase[0][hours];
-            break;
-            case hours < 12:
-              imageSrc = this.currentImageBase[1][hours];
-            break;
-            case hours < 18:
-                imageSrc = this.currentImageBase[2][hours];
-            break;
-            case hours < 23:
-                imageSrc = this.currentImageBase[3][hours];
-            break;
-            default:
-                imageSrc = this.currentImageBase[0][5];
-            break;
-        }
+    getImage (hours) {
+        let imageSrc = '';
+      
+        if (hours < 6) imageSrc = this.currentImageBase[0][`${hours}`];
+        else if (hours < 12) imageSrc = this.currentImageBase[1][`${hours}` - 6];
+        else if(hours < 18)  imageSrc = this.currentImageBase[2][`${hours}` - 12];
+        else imageSrc = this.currentImageBase[3][`${hours}` - 18];
+        console.log(imageSrc);
         this.setBgImage(imageSrc);
     } 
 
@@ -226,18 +216,8 @@ class Momentum {
         }; 
     }
 
-    viewAllImages() {
-        let now = new Date();
-        let hours = now.getHours();
-        for (let i = 0; i < 24; i++) {
-            hours += i;
-            console.log(hours);
-            if (hours < 23) this.getImage(hours);
-            else {
-               this.getImage(0);
-            }
-        }
-    }
+    
+   
 
     randomInteger(min, max) {
         // случайное число от min до (max+1)
@@ -254,7 +234,6 @@ class Momentum {
         this.getWeather();
         this.createImagesArray();
     }
-
 };
 
 //get DOM elements
@@ -274,6 +253,8 @@ const wind = document.querySelector('.wind');
 const weatherDescription = document.querySelector('.weather-description');
 const city = document.querySelector('.city');
 const updBcg = document.querySelector('.update-bcg');
+
+let i = 1; //counter of clicks for update background image btn
 
 const momentum = new Momentum();
 momentum.init();
@@ -325,5 +306,16 @@ city.addEventListener('click', () => {
 });
 
 document.addEventListener('load', momentum.createImagesArray);
-updBcg.addEventListener('click', momentum.viewAllImages);
+updBcg.addEventListener('click', () => {
+    let initHour = momentum.hours;
+    initHour+=i;
+    if (initHour > 23) {
+        momentum.getImage(0);
+        i = 0;
+    }
+    else momentum.getImage(initHour);
+    i++;
+});
 
+//ломается переход на второй круг обновлений картинок
+// нет обновления в 00 00

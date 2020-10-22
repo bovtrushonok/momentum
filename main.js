@@ -21,7 +21,7 @@ class Momentum {
         if(minutes < 10) minutes= '0' + minutes;
         this.time = `${hours}:${minutes}:${sec}`;
         time.textContent = this.time;
-        if(minutes == '29' && sec == '00') this.getImage(hours);
+        if(minutes == '00' && sec == '00') momentum.getImage(hours);
         setInterval (this.getTime, 1000); 
     }
 
@@ -317,4 +317,3 @@ updBcg.addEventListener('click', () => {
 });
 
 
-// нет обновления в 00 00

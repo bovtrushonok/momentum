@@ -125,9 +125,8 @@ class Momentum {
 
     setName(e) {
         if( e.type == 'keydown' && e.code == 'Enter' ) {
-            if (e.target.innerText == '') {
-                e.target.textContent = '[Enter Name]';
-                localStorage.removeItem('name');
+            if (e.target.innerText  == ''|| e.target.textContent.match(/^\s$/) ) {
+                e.target.textContent = (localStorage.getItem('name')) ? localStorage.getItem('name') :'[Enter Name]';
             }
             else localStorage.setItem('name', e.target.innerText);
             name.blur();
@@ -141,9 +140,9 @@ class Momentum {
 
     setFocus(e) {
         if( e.type == 'keydown' && e.code == 'Enter' ) {
-            if (e.target.innerText == '') {
-                e.target.textContent = '[Enter plan]';
-                localStorage.removeItem('focus');
+            if (e.target.innerText == '' || e.target.textContent.match(/^\s$/)) {
+                e.target.textContent = (localStorage.getItem('focus')) ? localStorage.getItem('focus') :'[Enter plan]';
+               
             }
             else localStorage.setItem('focus', e.target.innerText);
             focus.blur();
@@ -198,7 +197,6 @@ class Momentum {
 
     getImage (hours) {
         let imageSrc = '';
-      
         if (hours < 6) imageSrc = this.currentImageBase[0][`${hours}`];
         else if (hours < 12) imageSrc = this.currentImageBase[1][`${hours}` - 6];
         else if(hours < 18)  imageSrc = this.currentImageBase[2][`${hours}` - 12];
@@ -280,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 city.addEventListener('blur', (e) => {
-    if (city.textContent == '') {
+    if (city.textContent == '' || city.textContent.match(/^\s$/)) {
         city.textContent = (localStorage.getItem('city')) ? localStorage.getItem('city') : '[Enter city]';
     }
     else {
@@ -291,7 +289,7 @@ city.addEventListener('blur', (e) => {
 
 city.addEventListener('keydown', (e) => {
     if (e.keyCode == 13) {
-        if (city.textContent == '') {
+        if (city.textContent == '' || city.textContent.match(/^\s$/)) {
             city.textContent = (localStorage.getItem('city')) ? localStorage.getItem('city') : '[Enter city]';
           }
         else {

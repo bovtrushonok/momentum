@@ -21,7 +21,7 @@ class Momentum {
         if(minutes < 10) minutes= '0' + minutes;
         this.time = `${hours}:${minutes}:${sec}`;
         time.textContent = this.time;
-        if(minutes == '09' && sec == '00') getImage(hours);
+        if(minutes == '29' && sec == '00') this.getImage(hours);
         setInterval (this.getTime, 1000); 
     }
 
@@ -310,12 +310,11 @@ updBcg.addEventListener('click', () => {
     let initHour = momentum.hours;
     initHour+=i;
     if (initHour > 23) {
-        momentum.getImage(0);
-        i = 0;
+        i = -momentum.hours;
     }
     else momentum.getImage(initHour);
     i++;
 });
 
-//ломается переход на второй круг обновлений картинок
+
 // нет обновления в 00 00

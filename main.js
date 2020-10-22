@@ -311,6 +311,7 @@ updBcg.addEventListener('click', () => {
     initHour+=i;
     if (initHour > 23) {
         i = -momentum.hours;
+        momentum.getImage(0);
     }
     else momentum.getImage(initHour);
     i++;

@@ -209,13 +209,13 @@ h2 {
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   body {
     font-size: 40px;
   }
 
   .time {
-    font-size: 2em;
+    font-size: 1.5em;
   }
 }
 
